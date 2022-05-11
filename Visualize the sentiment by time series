@@ -1,0 +1,32 @@
+# Library       citation from https://r-graph-gallery.com/316-possible-inputs-for-the-dygraphs-library.html
+
+library(dygraphs)
+library(xts)
+
+tw_data_sent_positive <- tw_data_sent %>%
+  select(time, sentiment) %>%
+  filter(sentiment > 0)
+
+tw_data_sent_negative <- tw_data_sent %>%
+  select(time, sentiment) %>%
+  filter(sentiment < 0)
+
+tw_data_sent_full <- tw_data_sent_positive %>%
+   full_join(tw_data_sent_negative, by = "time")  #integrating two subsets
+ 
+colnames(tw_data_sent_full) <- c("time", "positive", "negative")
+
+tw_data_sent_full$positive[is.na(tw_data_sent_full$positive)] <- 0 
+
+tw_data_sent_full$negative[is.na(tw_data_sent_full$negative)] <- 0 
+
+don <- xts(x = tw_data_sent_full[,-1], order.by =tw_data_sent_full$time)
+
+# Make the chart
+p <- dygraph(don)
+
+library(htmlwidgets)
+saveWidget(p, file=paste0("/Users/lelesmac/Desktop/R-WD/CM", "graph.html"))
+
+View the Interactive Time Series Visualization:
+file:///Users/lelesmac/Desktop/R-WD/Time%20Series%20Visualization_Tao.html
